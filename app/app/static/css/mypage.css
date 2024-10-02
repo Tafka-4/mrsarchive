@@ -1,0 +1,161 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+h1, h2 {
+    text-align: center;
+    color: inherit;
+    margin-top: 20px;
+}
+
+.user-info {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin: 60px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    transition: background-color 0.3s;
+}
+
+.user-name {
+    font-size: 25px;
+}
+
+.profile-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.change-image-button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    display: block;
+}
+
+.change-image-button:hover {
+    background-color: #0056b3;
+}
+
+.user-actions {
+    margin-top: 10px;
+}
+
+.user-actions .edit-button {
+    padding: 8px 20px;
+    margin-top: 6px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+
+.edit-form, .image-upload {
+    margin: 20px auto;
+    width: 50%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.edit-form label, .image-upload label {
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.text-input, .textarea-input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.textarea-input {
+    height: 100px; /* 높이를 크게 설정하여 소개글을 쓰기 용이하게 함 */
+    resize: vertical; /* 수직으로 크기 조정 가능 */
+}
+
+.save-button, .change-password {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:hover, .change-password:hover {
+    background-color: #218838;
+}
+
+.activity-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.activity-item {
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    width: 60%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .user-info, html.dark-mode .activity-item, html.dark-mode .edit-form, html.dark-mode .image-upload {
+    background-color: #3b3b3b;
+}
+
+html.dark-mode .edit-form label, html.dark-mode .image-upload label {
+    color: #f4f4f4;
+}
+
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.home-button, .dark-mode-toggle {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.home-button:hover, .dark-mode-toggle:hover {
+    background-color: #555;
+}

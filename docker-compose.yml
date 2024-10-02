@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  nginx:
+      image: nginx:alpine
+      container_name: nginx_proxy
+      ports:
+        - "80:80"
+      volumes:
+        - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      depends_on:
+        - web
+        - api
+  api:
+    build: 
+      context: .
+      dockerfile: DockerfileAPI
+    volumes:
+      - ./api:/app
+    expose:
+      - "5000:5000"
+    links:
+      - db
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DB=web_novel
+      - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0
+    depends_on:
+      - db
+  web:
+    build:
+      context: .
+      dockerfile: DockerfileAPP
+    volumes:
+      - ./app:/app
+    expose:
+      - "8000:8000"
+    depends_on:
+      - api
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: web_novel
+      MYSQL_ROOT_PASSWORD: 1234
+    expose:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+  
+  redis:
+    image: redis:alpine
+    command: redis-server --port 6379
+    expose:
+      - "6379:6379"
+    
+volumes:
+  db_data:

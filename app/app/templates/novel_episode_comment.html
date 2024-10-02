@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/novel_episode_comment.css') }}">
+    <title>{{ novel.title }} - 댓글</title>
+    <div class="novel-info"></div>
+        {% if novel.thumbnail %}
+        <img src="{{ novel.thumbnail }}" alt="{{ novel.title }}" class="thumbnail">
+        {% else %}
+        <img src="{{ url_for('static', filename='image/default_profile.jpg') }}" alt="{{ novel.title }}" width="210px" height="300px", class="thumbnail">
+        {% endif %}
+        <div>
+            {% if not edit %}
+            <h1 class="novel-title">{{ novel.title }}</h1>
+            {% else %}
+            <h1 class="novel-title">{{ novel.title }} - Ep.{{ edit.episode }} {{ edit.title }}</h1>
+            {% endif %}
+            
+            {% if not edit %}
+
+            {% if novel.recommendations == 0 and novel.dislikes == 0 and novel.views == 0 %}
+            <p>조회: {{ novel.views }} | 반응 지수: <i>NaN</i> | 에피소드 수: {{ novel.episode }}</p>
+            {% else %}
+            {% set novel_rate = '%0.2f' %(novel.recommendations - novel.dislikes + 0.01*novel.views + 1.5*novel.favorites) | float %}
+            <p>조회: {{ novel.views }} | 반응 지수: <i>{{ novel_rate }}</i> | 에피소드 수: {{ novel.episode }}</p>
+            {% endif %}
+
+            {% else %}
+
+            {% if edit.recommendations == 0 and edit.dislikes == 0 and edit.views == 0 %}
+            <p>조회: {{ edit.views }} | 좋아요: {{ edit.recommendations }} | 싫어요: {{ edit.dislikes }} | 반응지수: <i>NaN</i></p>
+            {% else %}
+            {% set novel_rate = '%0.2f' %(edit.recommendations - edit.dislikes + 0.01*edit.views) | float %}
+            <p>조회: {{ edit.views }} | 좋아요: {{ edit.recommendations }} | 싫어요: {{ edit.dislikes }} | 반응 지수: <i>{{ novel_rate }}</i></p>
+            {% endif %}
+
+            {% endif %}
+            <p class="novel-introduction-text">{{ novel.introduction }}</p>
+        </div>
+    </div>
+
+</head>
+<body>
+    <h1>{{ novel.title }} 댓글</h1>
+    <ul id="comments-list"></ul>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>댓글 페이지</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="top-right">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+        <!-- 필요한 경우 다른 버튼 추가 -->
+    </div>
+    <h1>댓글 페이지</h1>
+
+    <!-- 댓글 작성 폼 -->
+    <div id="comment-form">
+        <h2>댓글 작성</h2>
+        <textarea id="comment-content" placeholder="댓글을 작성하세요."></textarea>
+        <button onclick="postComment()">댓글 작성</button>
+    </div>
+
+    <!-- 댓글 섹션 -->
+    <div id="comment-section">
+        <!-- 댓글은 JavaScript를 통해 로드됩니다 -->
+    </div>
+
+    <script>
+        const userId = {{ user_id }};
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function loadComments() {
+            fetch('/api/comments/novel-comment/{{ novel_id }}', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+            .then(data => {
+                displayComments(data);
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function displayComments(comments) {
+            const commentSection = document.getElementById('comment-section');
+            commentSection.innerHTML = '';
+
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+
+                // 대댓글인 경우
+                if (comment.parent_comment_id) {
+                    commentDiv.classList.add('reply-comment');
+                }
+
+                // 프로필 이미지
+                const profileImg = document.createElement('img');
+                profileImg.src = comment.profile_image || '{{ url_for('static', filename='image/default_profile.jpg') }}';
+                profileImg.alt = 'Profile Image';
+                profileImg.className = 'profile-image';
+                commentDiv.appendChild(profileImg);
+
+                // 댓글 내용
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'comment-content';
+
+                const userIdP = document.createElement('p');
+                userIdP.textContent = 'User ID: ' + comment.user_id;
+                contentDiv.appendChild(userIdP);
+
+                const contentP = document.createElement('p');
+                contentP.textContent = comment.content;
+                contentDiv.appendChild(contentP);
+
+                // 버튼 섹션
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'comment-buttons';
+
+                const likeButton = document.createElement('button');
+                likeButton.textContent = '좋아요 (' + comment.recommendations + ')';
+                likeButton.onclick = () => likeComment(comment.comment_id);
+                buttonsDiv.appendChild(likeButton);
+
+                const dislikeButton = document.createElement('button');
+                dislikeButton.textContent = '싫어요 (' + comment.dislikes + ')';
+                dislikeButton.onclick = () => dislikeComment(comment.comment_id);
+                buttonsDiv.appendChild(dislikeButton);
+
+                const reportButton = document.createElement('button');
+                reportButton.textContent = '신고';
+                reportButton.onclick = () => reportComment(comment.comment_id);
+                buttonsDiv.appendChild(reportButton);
+
+                // 수정 버튼 (현재 사용자가 작성자인 경우)
+                if (comment.user_id === userId) {
+                    const editButton = document.createElement('button');
+                    editButton.textContent = '수정';
+                    editButton.onclick = () => editComment(comment.comment_id);
+                    buttonsDiv.appendChild(editButton);
+                }
+
+                // 대댓글 작성 버튼
+                const replyButton = document.createElement('button');
+                replyButton.textContent = '답글';
+                replyButton.onclick = () => replyComment(comment.comment_id);
+                buttonsDiv.appendChild(replyButton);
+
+                contentDiv.appendChild(buttonsDiv);
+                commentDiv.appendChild(contentDiv);
+
+                commentSection.appendChild(commentDiv);
+            });
+        }
+
+        function postComment(parentCommentId = null) {
+            const content = document.getElementById('comment-content').value;
+            if (!content) {
+                alert('댓글 내용을 입력하세요.');
+                return;
+            }
+
+            fetch('/api/comments', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: content,
+                    user_id: userId,
+                    parent_comment_id: parentCommentId
+                })
+            }).then(response => {
+                if (response.ok) {
+                    alert('댓글이 작성되었습니다.');
+                    document.getElementById('comment-content').value = '';
+                    loadComments();
+                } else {
+                    alert('댓글 작성에 실패했습니다.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            });
+        }
+
+        function likeComment(commentId) {
+            fetch(`/api/comments/${commentId}/like`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => {
+                if (response.ok) {
+                    loadComments();
+                } else {
+                    alert('좋아요에 실패했습니다.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function dislikeComment(commentId) {
+            fetch(`/api/comments/${commentId}/dislike`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => {
+                if (response.ok) {
+                    loadComments();
+                } else {
+                    alert('싫어요에 실패했습니다.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function reportComment(commentId) {
+            if (confirm('이 댓글을 신고하시겠습니까?')) {
+                fetch(`/api/comments/${commentId}/report`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                        'Content-Type': 'application/json'
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        alert('신고가 접수되었습니다.');
+                    } else {
+                        alert('신고에 실패했습니다.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function editComment(commentId) {
+            const newContent = prompt('댓글을 수정하세요:');
+            if (newContent !== null) {
+                fetch(`/api/comments/${commentId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: newContent
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('댓글이 수정되었습니다.');
+                        loadComments();
+                    } else {
+                        alert('댓글 수정에 실패했습니다.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function replyComment(parentCommentId) {
+            const content = prompt('답글을 작성하세요:');
+            if (content !== null) {
+                fetch('/api/comments', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: content,
+                        user_id: userId,
+                        parent_comment_id: parentCommentId
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('답글이 작성되었습니다.');
+                        loadComments();
+                    } else {
+                        alert('답글 작성에 실패했습니다.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        }
+
+        // 페이지 로드 시 댓글 불러오기
+        window.onload = loadComments;
+    </script>
+</body>
+</html>

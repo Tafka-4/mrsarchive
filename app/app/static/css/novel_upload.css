@@ -1,0 +1,145 @@
+/* 기본 스타일 */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* 페이지 높이 전체에 맞춤 */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* 상단 우측 버튼 */
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.dark-mode-toggle, .mypage-button {
+    background-color: #444; /* 페이지와 어울리게 변경 */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.dark-mode-toggle:hover, .mypage-button:hover {
+    background-color: #666; /* 다크 모드 시 자연스럽게 변경 */
+}
+
+.upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px; /* 최대 너비 설정 */
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff; /* 밝은 배경색 설정 */
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+/* 다크 모드에서 폼 배경 색상 변경 */
+html.dark-mode .upload {
+    background-color: #333; /* 다크 모드에서는 어두운 배경색 */
+    color: #f4f4f4; /* 다크 모드에서의 텍스트 색상 */
+}
+
+/* 소설 표지 섹션 */
+.thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.thumbnail-image {
+    width: 210px; /* 7:10 비율 */
+    height: 300px; /* 7:10 비율 */
+    object-fit: cover; /* 이미지가 영역을 넘지 않게 채움 */
+    background-color: #eee; /* 빈 공간을 공백으로 채움 */
+}
+
+.change-image-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.change-image-button:hover {
+    background-color: #0056b3;
+}
+
+/* 폼 요소 배치 */
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center; /* 중앙 정렬 */
+}
+
+input[type="text"], input[type="submit"], textarea {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    padding: 10px;
+    width: 80%; /* 입력창 너비를 넓게 설정 */
+    max-width: 500px; /* 최대 너비 설정 */
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+input[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* 다크 모드 적용 */
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+html.dark-mode input[type="text"], html.dark-mode textarea, html.dark-mode {
+    background-color: #2b2b2b;
+    color: white;
+    border: 1px solid #444;
+}
+
+html.dark-mode input[type="text"]:focus, html.dark-mode textarea:focus {
+    border-color: #555;
+}

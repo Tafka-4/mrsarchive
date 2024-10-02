@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Ep.{{content.episode}} - {{ content.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/viewer.css') }}">
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <div class="top-right">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+            <button class="mypage-button" onclick="location.href='/novel/{{content.novel_id}}'">소설 정보로</button>
+        </div>
+        <nav class="hamburger-menu">
+            <input type="checkbox" id="menu-toggle"/>
+            <label for="menu-toggle" class="menu-icon">
+                <img src="{{ url_for('static', filename='image/hamburger_button.svg') }}" alt="Menu">
+            </label>
+            <div class="slide-menu">
+                {% if content.type == 'notice' %}
+                <h2>Noitce No.{{ content.num }} - {{ content.title }}</h2>
+                {% else %}
+                <h2>Ep.{{ content.episode }} - {{ content.title }}</h2>
+                {% endif %}
+                {% if content.recommendations == 0 and content.dislikes == 0 and content.views == 0 %}
+                <p class="episode-meta">조회: {{ content.views }} | 좋아요: {{ content.recommendations }} | 싫어요: {{ content.dislikes }} | 반응지수: <i>NaN</i></p>
+                {% else %}
+                {% set novel_rate = '%0.2f' %(content.recommendations - content.dislikes + 0.01*content.views) | float %}
+                <p class="episode-meta">조회: {{ content.views }} | 좋아요: {{ content.recommendations }} | 싫어요: {{ content.dislikes }} | 반응 지수: <i>{{ novel_rate }}</i></p>
+                {% endif %}
+                <p class="episode-date"><i>Created at: {{ content.created_at }}</i></p>
+                <ul>
+                    <li>
+                        <span><b>- 원하는 에피소드로 이동</b></span><br>
+                        <input type="number" id="episode-input" placeholder="에피소드 번호 입력" min="1" style="width: 60%; padding: 5px;">
+                        <a onclick="goToEpisode({{ content.novel_id }})" style="padding: 5px;" class="button">이동</a>
+                    </li>
+                    <li><a href="/novel/{{ content.novel_id }}/comment/episode/{{ content.episode }}"><b>- 댓글창으로 이동</b></a></li>
+                    <div class="episode-reaction">
+                        {% if content.type == 'notice' %}
+                        <a onclick="handleNoticeLike({{ content.novel_id }}, {{ content.num }})"><img src="{{ url_for('static', filename='image/like.svg') }}" alt="좋아요 누르기" width="25"></a><span class="novel-introduction-text">{{ content.recommendations }} |</span>
+                        <a onclick="handleNoticeDislike({{ content.novel_id }}, {{ content.num }})"><img src="{{ url_for('static', filename='image/dislike.svg') }}" alt="싫어요 누르기" width="25"></a><span class="novel-introduction-text">{{ content.dislikes }} </span>
+                        {% else %}
+                        <a onclick="handleEpisodeLike({{ content.novel_id }}, {{ content.episode }})"><img src="{{ url_for('static', filename='image/like.svg') }}" alt="좋아요 누르기" width="25"></a><span class="novel-introduction-text">{{ content.recommendations }} |</span>
+                        <a onclick="handleEpisodeDislike({{ content.novel_id }}, {{ content.episode }})"><img src="{{ url_for('static', filename='image/dislike.svg') }}" alt="싫어요 누르기" width="25"></a><span class="novel-introduction-text">{{ content.dislikes }} </span>                  
+                        {% endif %}
+                    </div>
+                </ul>
+                <div class="close-btn">
+                    <label for="menu-toggle" class="close-menu">닫기</label>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <article class="novel-content">
+            <!-- XSS Filterd! -->
+            {{ content.content | safe}}
+
+            <br>
+            <section class="author-note">
+                <h3>작가의 말</h3>
+                <div style="white-space: pre-wrap;">
+                    <p>{{ content.author_note }}</p>
+                </div>
+            </section>
+
+            <div class="next-chapter">
+                {% if content.is_last %}
+                <p class="button">등록된 마지막 회차입니다.</p>
+                {% else %}
+
+                {% if content.type == 'notice'%}
+                <a href="/view/notice/{{ content.novel_id }}/{{ content.num + 1 }}" class="button">다음 공지로 이동</a>
+                {% else %}
+                <a href="/view/episode/{{ content.novel_id }}/{{ content.episode + 1 }}" class="button">다음 회차로 이동</a>
+                {% endif %}
+
+                {% endif %}
+            </div>
+        </article>
+    </main>
+    <script>
+        function goToEpisode(novelId) {
+            var episodeNumber = document.getElementById('episode-input').value;
+            if (episodeNumber) {
+                window.location.href = `/view/episode/${novelId}/${episodeNumber}`;
+            } else {
+                alert("에피소드 번호를 입력하세요.");
+            }
+        }
+        
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const csrfToken = getCookie('csrf_access_token');
+
+        function handleEpisodeLike(novelID, episodeId) {
+            fetch(`/api/novels/${novelID}/episode/${episodeId}/like`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+    
+        function handleEpisodeDislike(novelID, episodeId) {
+            fetch(`/api/novels/${novelID}/episode/${episodeId}/dislike`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+
+        function handleNoticeLike(novelID, noticeNum) {
+            fetch(`/api/novels/${novelID}/notice/${noticeNum}/like`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.")
+                }
+                location.reload();
+            })
+        }
+
+        function handleNoticeDislike(novelID, noticeNum) {
+            fetch(`/api/novels/${novelID}/notice/${noticeNum}/dislike`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.")
+                }
+                location.reload();
+            })
+        }
+    </script>
+</body>
+</html>

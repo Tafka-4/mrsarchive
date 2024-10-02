@@ -1,0 +1,437 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+#menu-toggle {
+    display: none;
+}
+
+h1, h2 {
+    text-align: center;
+    color: inherit;
+    margin-top: 20px;
+}
+
+.hamburger-menu {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.slide-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: min(50%, 600px);
+    height: 100%;
+    background-color: #f4f4f4;
+    color: #333;
+    transition: left 0.3s ease-in-out, background-color 0.3s, color 0.3s;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+html.dark-mode .slide-menu {
+    background-color: #333;
+    color: #f4f4f4;
+}
+
+/* 슬라이드 메뉴가 열렸을 때 표시 */
+#menu-toggle:checked ~ .slide-menu {
+    left: 0;
+}
+
+.menu-icon img {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    transition: filter 0.3s;
+}
+
+html.dark-mode .menu-icon img {
+    filter: invert(1);
+}
+
+.slide-menu h2 {
+    margin-top: 0;
+}
+
+.slide-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.slide-menu li {
+    margin-bottom: 15px;
+}
+
+.slide-menu a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.close-btn {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.close-menu {
+    cursor: pointer;
+    color: inherit; 
+    background-color: transparent;
+    border: none;
+    font-size: 16px;
+}
+
+.notice-block {
+    display: block;
+    justify-content: left;
+    margin-top: 12px;
+    background-color: #bbb;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.notice-title {
+    color: black;
+    margin: 4px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+html.dark-mode .notice-title {
+    color: #ddd
+}
+
+html.dark-mode .notice-block {
+    background-color: #222;
+    transition: 0.3s;
+}
+
+.notice-meta {
+    margin: 4px;
+    transition: 0.3s;
+}
+
+html.dark-mode .notice-meta {
+    color: #bbb;
+    transition: 0.3s;
+}
+
+.notice-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.notice-date {
+    color: #6f6f6f;
+    margin: 0;
+    transition: color 0.3s;
+}
+
+.novel-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 60px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 60%;
+    transition: background-color 0.3s;
+}
+
+.novel-title {
+    display: flex;
+    font-size: 25px;
+}
+
+.thumbnail {
+    margin-right: 15%;
+    width: 210px;
+    height: 300px; 
+    border-radius: 8px;
+    object-fit: cover; 
+    background-color: #eee; 
+}
+
+.novel-introduction {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #eaeaea;
+    padding: 10px;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+.novel-introduction-text {
+    margin: 0;
+    padding: 0;
+    line-height: 2;
+    color: black;
+}
+
+.icon-wrapper {
+    display: inline-block;
+    justify-content: left;
+    align-items: center;
+    width: 1200px;
+    margin-right: 5px;
+}
+
+.icon-wrapper img {
+    vertical-align: middle;
+}
+
+html.dark-mode .icon-wrapper {
+    color: white
+}
+
+.icon-wrapper:last-child {
+    display: block;
+    margin-top: 5px;
+}
+
+html.dark-mode .icon-wrapper {
+    filter: invert(1);
+    transition: filter 0.3s;
+}
+
+html.dark-mode .novel-info {
+    background-color: #333;
+}
+
+html.dark-mode .novel-introduction {
+    background-color: #222;
+}
+
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.novel-info img {
+    margin-right: 20px;
+    border-radius: 8px;
+}
+
+.novel-info div {
+    max-width: 60%;
+}
+
+.action-buttons {
+    margin-top: 10px;
+}
+
+.action-buttons button {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+
+.action-buttons button:hover {
+    background-color: #0056b3;
+}
+
+.delete button {
+    display: inline;
+    padding: 8px 12px;
+    margin-right: 10px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff4c4c;
+    color: white;
+    cursor: pointer;
+}
+
+.delete button:hover {
+    background-color: #ff1a1a;
+}
+
+.upload-episode {
+    padding: 8px 20px;
+    margin-top: 6px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+
+.episode-list {
+    display: auto;
+    list-style-type: none;
+}
+
+.episode-item {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    background-color: #ffffff; /* Match the gray background in the image */
+    border-radius: 8px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    width: 60%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .episode-item {
+    background-color: #3b3b3b;
+}
+
+.episode-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: color 0.3s;
+}
+
+.episode-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    margin: 0;
+    transition: color 0.3s;
+}
+
+.episode-title a:hover {
+    text-decoration: underline;
+}
+
+.episode-reaction {
+    display: inline-block;
+    justify-content: left;
+    align-items: center;
+    margin-right: 10px
+}
+
+.episode-reaction img {
+    vertical-align: middle;
+}
+
+.episode-reaction {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;  
+    width: 100%;  
+}
+
+html.dark-mode .episode-reaction span {
+    color: #ddd
+}
+
+.episode-reaction:last-child {
+    display: block;
+    margin-top: 5px;
+}
+
+html.dark-mode .episode-reaction img {
+    filter: invert(1);
+    transition: filter 0.3s;
+}
+
+html.dark-mode .episode-title a {
+    color: #ddd
+}
+
+html.dark-mode .episode-meta {
+    color: #ddd
+}
+
+html.dark-mode .episode-date {
+    color: #bbb
+}
+
+.episode-meta {
+    font-size: 14px;
+    color: #8d8d8d;
+    margin-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.episode-date {
+    font-size: 14px;
+    color: #6f6f6f;
+    margin: 0;
+    transition: color 0.3s;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination a, .pagination span {
+    color: inherit;
+    padding: 10px 15px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    margin: 0 5px;
+    border-radius: 4px;
+}
+
+.pagination a:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+.pagination .active {
+    background-color: #007BFF;
+    color: white;
+    border: 1px solid #007BFF;
+}
+
+.dark-mode-toggle {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.dark-mode-toggle:hover {
+    background-color: #555;
+}

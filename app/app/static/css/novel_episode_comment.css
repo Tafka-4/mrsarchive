@@ -1,0 +1,32 @@
+/* 기본 댓글 스타일 */
+ul#comments-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul#comments-list li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.comment-content, .reply-content {
+    font-size: 14px;
+}
+
+/* 대댓글 스타일 */
+.replies-list {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.replies-list li {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 4px;
+}

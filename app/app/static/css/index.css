@@ -1,0 +1,264 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    color: inherit;
+    margin-top: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 60%;
+    transition: background-color 0.3s;
+}
+
+html.dark-mode li {
+    background-color: #333;
+    border-color: #444;
+}
+
+img {
+    margin-right: 20px;
+    border-radius: 8px;
+}
+
+h2 {
+    margin: 0 0 10px;
+    color: #007BFF;
+}
+
+h2 a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+h2 a:hover {
+    text-decoration: underline;
+}
+
+p {
+    margin: 5px 0;
+    color: inherit;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+input[type="text"] {
+    padding: 8px;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+input[type="submit"] {
+    padding: 8px 12px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.thumbnail {
+    margin-right: 10%;
+    width: 84px;
+    height: 120px; 
+    border-radius: 8px;
+    object-fit: cover; 
+    background-color: #eee; 
+}
+
+.pagination a, .pagination span {
+    color: inherit;
+    padding: 10px 15px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    margin: 0 5px;
+    border-radius: 4px;
+}
+
+.pagination a:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+.pagination .active {
+    background-color: #007BFF;
+    color: white;
+    border: 1px solid #007BFF;
+}
+
+.mypage-button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.mypage-button:hover {
+    background-color: #555;
+}
+
+.delete-button {
+    background-color: #ff4c4c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #ff1a1a;
+}
+
+
+.dark-mode-toggle {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.dark-mode-toggle:hover {
+    background-color: #555;
+}
+
+.comment {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin: 10px auto;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    border-radius: 8px;
+    width: 60%;
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .comment {
+    background-color: #333;
+    border-color: #444;
+}
+
+.reply-comment {
+    margin-left: 40px;
+}
+
+.profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-content p {
+    margin: 5px 0;
+}
+
+.comment-buttons {
+    margin-top: 10px;
+}
+
+.comment-buttons button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.comment-buttons button:hover {
+    background-color: #0056b3;
+}
+
+#comment-form {
+    width: 60%;
+    margin: 20px auto;
+}
+
+#comment-form textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+#comment-form button {
+    margin-top: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#comment-form button:hover {
+    background-color: #0056b3;
+}

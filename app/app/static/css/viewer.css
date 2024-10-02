@@ -1,0 +1,223 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#menu-toggle {
+    display: none;
+}
+
+html.dark-mode body {
+    background-color: #1e1e1e;
+    color: #f4f4f4;
+}
+
+.hamburger-menu {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.menu-icon img {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    transition: filter 0.3s;
+}
+
+html.dark-mode .menu-icon img {
+    filter: invert(1);
+}
+
+.slide-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: min(50%, 600px);
+    height: 100%;
+    background-color: #f4f4f4; /* 기본 모드에서의 배경색 */
+    color: #333; /* 기본 모드에서의 텍스트 색상 */
+    transition: left 0.3s ease-in-out, background-color 0.3s, color 0.3s; /* 배경색과 텍스트 색상에 대한 전환 추가 */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode .slide-menu {
+    background-color: #333; /* 다크 모드에서의 배경색 */
+    color: #f4f4f4; /* 다크 모드에서의 텍스트 색상 */
+}
+
+#menu-toggle:checked ~ .slide-menu {
+    left: 0;
+}
+
+.slide-menu h2 {
+    margin-top: 0;
+}
+
+.slide-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.slide-menu li {
+    margin-bottom: 15px;
+}
+
+.slide-menu a {
+    color: inherit; /* 텍스트 색상이 현재 모드에 맞게 변경되도록 설정 */
+    text-decoration: none;
+}
+
+html.dark-mode .episode-meta {
+    color: #ddd
+}
+
+html.dark-mode .episode-date {
+    color: #bbb
+}
+
+.episode-meta {
+    font-size: 14px;
+    color: #8d8d8d;
+    margin-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.episode-date {
+    font-size: 14px;
+    color: #6f6f6f;
+    margin: 0;
+    transition: color 0.3s;
+}
+
+.episode-reaction {
+    display: inline-block;
+    justify-content: right;
+    align-items: center;
+    color: black;
+    margin-right: 10px;
+}
+
+.episode-reaction img {
+    vertical-align: middle;
+}
+
+.episode-reaction:last-child {
+    display: block;
+    margin-top: 5px;
+}
+
+html.dark-mode .episode-reaction {
+    filter: invert(1);
+    transition: filter 0.3s, color 0.3s;
+}
+
+.close-btn {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.close-menu {
+    cursor: pointer;
+    color: inherit; /* 현재 모드에 맞게 색상이 변경되도록 설정 */
+    background-color: transparent;
+    border: none;
+    font-size: 16px;
+}
+
+.novel-content {
+    width: 60%;
+    margin: 40px auto;
+    background-color: #fff;
+    margin: 60px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+html.dark-mode .novel-content {
+    background-color: #333;
+    color: #f4f4f4;
+}
+
+.author-note {
+    margin-top: 20px;
+}
+
+.next-chapter {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.mypage-button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.mypage-button:hover {
+    background-color: #555;
+}
+
+.dark-mode-toggle {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.dark-mode-toggle:hover {
+    background-color: #555;
+}
+
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}

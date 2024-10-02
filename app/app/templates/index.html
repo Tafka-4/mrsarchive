@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마연회 아카이브 0.1.0v</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="top-right">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+        <button class="mypage-button" onclick="location.href='/novel/upload'">소설 연재</a>
+        <button class="mypage-button" onclick="location.href='/mypage'">내 페이지</a>
+    </div>
+    <h1>마연회 아카이브 0.1.0v</h1>
+    <form method="get" action="/">
+        <input type="text" name="search" placeholder="소설 제목 검색" value="{{ search_query }}">
+        <input type="submit" value="검색">
+    </form>
+    <ul>
+        {% for novel in novels %}
+        <li>
+            {% if novel.thumbnail %}
+            <img src="{{ novel.thumbnail }}" alt="{{ novel.title }}" class="thumbnail">
+            {% else %}
+            <img src="{{ url_for('static', filename='image/default_profile.jpg') }}" alt="{{ novel.title }}" width="210px" height="300px", class="thumbnail">
+            {% endif %}
+            <div>
+                <h2><a href="/novel/{{ novel.novel_id }}">{{ novel.title }}</a></h2>
+                <p>{{ novel.introduction[:50] }}{% if novel.introduction|length > 50 %}...{% endif %}</p>
+                <p>조회수: {{ novel.views }} | 좋아요: {{ novel.recommendations }} | 싫어요: {{ novel.dislikes }} | 즐겨찾기: {{ novel.favorites }} | 에피소드: {{ novel.episode }}</p>
+    
+                {% if novel.is_author %}
+                <button class="delete-button" onclick="deleteNovel({{ novel.novel_id }})">소설 삭제</button>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/?page=1&search={{ search_query }}">First</a>
+        <a href="/?page={{ page - 1 }}&search={{ search_query }}">&#60; Prev</a>
+        {% endif %}
+
+        {% for i in range(1, total_page + 1) %}
+            {% if i == page %}
+                <span class="active">{{ i }}</span>
+            {% else %}
+                <a href="/?page={{ i }}&search={{ search_query }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_page %}
+        <a href="/?page={{ page + 1 }}&search={{ search_query }}">Next &#62;</a>
+        <a href="/?page={{ total_page }}&search={{ search_query }}">Last</a>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function deleteNovel(novelId) {
+        if (confirm('정말로 삭제하시겠습니까?')) {
+            fetch(`/api/novels/${novelId}/delete`, {
+                method: 'DELETE',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': getCookie("csrf_access_token"),
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => {
+                if (response.ok) {
+                    alert('소설이 삭제되었습니다.');
+                    location.reload();
+                } else {
+                    alert('소설 삭제에 실패했습니다. 소설 내의 모든 에피소드, 공지 사항을 삭제해야 합니다.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            });
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ novel.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/novel.css') }}">
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="top-right">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+        <button class="dark-mode-toggle" class="mypage-button" onclick="location.href='/'">홈으로</a>
+    </div>
+    <header>
+        <nav class="hamburger-menu">
+            <input type="checkbox" id="menu-toggle"/>
+            <label for="menu-toggle" class="menu-icon">
+                <img src="{{ url_for('static', filename='image/hamburger_button.svg') }}" alt="Menu">
+            </label>
+            <div class="slide-menu">
+                <ul>
+                    <li>
+                        <span><b>- 원하는 에피소드로 이동</b></span><br>
+                        <input type="number" id="episode-input" placeholder="에피소드 번호 입력" min="1" style="width: 60%; padding: 5px;">
+                        <a onclick="goToEpisode({{ novel.novel_id }})" style="padding: 5px;" class="button">이동</a>
+                    </li>
+                    <li><a href="/novel/{{ novel.novel_id }}/comment"><b>- 댓글창으로 이동</b></a></li>
+                    <div class="close-btn">
+                        <label for="menu-toggle" class="close-menu">닫기</label>
+                    </div>
+                </ul>
+                <li>
+                    <span><b>- 공지사항</b></span>
+                    <ul class="notice-list">
+                        {% if notices %}
+                        {% for notice in notices %}
+                        <div class="notice-block">
+                            <a class="notice-title" href="/view/notice/{{ novel.novel_id }}/{{ notice.num }}"><b>{{ notice.title }}</b></a>
+                            {% if notice.recommendations == 0 and notice.dislikes == 0 and notice.views == 0 %}
+                            <p class="notice-meta">조회: {{ notice.views }} | 좋아요: {{ notice.recommendations }} | 싫어요: {{ notice.dislikes }} | 반응지수: <i>NaN</i></p>
+                            {% else %}
+                            {% set notice_rate = '%0.2f' %(notice.recommendations - notice.dislikes + 0.01*notice.views) | float %}
+                            <p class="notice-meta">조회: {{ notice.views }} | 좋아요: {{ notice.recommendations }} | 싫어요: {{ notice.dislikes }} | 반응 지수: <i>{{ notice_rate }}</i></p>
+                            {% endif %}
+                            <p class="notice-date"><i>Created at: {{ notice.created_at }}</i></p>
+                            {% endfor %}
+                        {% else %}
+                        <p class="notice-meta">None</p>
+                        {% endif %}
+                        </div>
+                    </ul>
+                </li>
+            </div>
+        </nav>
+    </header>
+    <div class="novel-info">
+        {% if novel.thumbnail %}
+        <img src="{{ novel.thumbnail }}" alt="{{ novel.title }}" width="210px" height="300px", class="thumbnail">
+        {% else %}
+        <img src="{{ url_for('static', filename='image/default_profile.jpg') }}" alt="{{ novel.title }}" width="210px" height="300px", class="thumbnail">
+        {% endif %}
+        <div>
+            <h1 class="novel-title">{{ novel.title }}</h1>
+            {% if novel.author_id == 1 %}
+            <p><span>작가: <b>[ADMIN]</b> {{ novel.author_nickname }}</span><i> (UID: {{novel.author_id}})</i></p>
+            {% else %}
+            <p><span>작가: {{ novel.author_nickname }}</span><i> (UID: {{novel.author_id}})</i></p>
+            {% endif %}
+    
+            {% if novel.recommendations == 0 and novel.dislikes == 0 and novel.views == 0 %}
+            <p>조회: {{ novel.views }} | 반응 지수: <i>NaN</i> | 에피소드 수: {{ novel.episode }}</p>
+            {% else %}
+            {% set novel_rate = '%0.2f' %(novel.recommendations - novel.dislikes + 0.01*novel.views + 1.5*novel.favorites) | float %}
+            <p>조회: {{ novel.views }} | 반응 지수: <i>{{ novel_rate }}</i> | 에피소드 수: {{ novel.episode }}</p>
+            {% endif %}
+            <div class="novel-introduction">
+                <div class="icon-wrapper">
+                    <a onclick="handleLike({{ novel.novel_id }})"><img src="{{ url_for('static', filename='image/like.svg') }}" alt="좋아요 누르기" width="25"></a><span class="novel-introduction-text">{{ novel.recommendations }} |</span>
+                    <a onclick="handleDislike({{ novel.novel_id }})"><img src="{{ url_for('static', filename='image/dislike.svg') }}" alt="싫어요 누르기" width="25"></a><span class="novel-introduction-text">{{ novel.dislikes }} |</span>
+                    <a onclick="handleFavorite({{ novel.novel_id }})"><img src="{{ url_for('static', filename='image/star.svg') }}" alt="즐겨찾기 추가" width="25"></a><span class="novel-introduction-text">{{ novel.favorites }}</span>
+                    <p class="novel-introduction-text">{{ novel.introduction }}</p>
+                </div>
+            </div>
+            {% if is_author %}
+            <button class="upload-episode" onclick="location.href='/novel/{{novel.novel_id}}/episode/upload'">신규 회차 등록</button>
+            <button class="upload-episode" onclick="location.href='/novel/{{novel.novel_id}}/notice/upload'">신규 공지 등록</button>
+            <div class="delete">
+                <button class="delete" onclick="deleteNovel({{ novel.novel_id }})">소설 삭제</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <h2>에피소드 목록</h2>
+    <ul class="episode-list">
+        {% for episode in novel.episode_data %}
+        <li class="episode-item">
+            <div class="episode-info">
+                <p class="episode-title"><a class="episode-title" href="/view/episode/{{ novel.novel_id }}/{{ episode.episode }}">{{ episode.title }}</a></p>
+                <p class="episode-meta">Ep.{{ episode.episode }} | Views: {{ episode.views }} | Likes: {{ episode.recommendations }}</p>
+                <p class="episode-date">{{ episode.created_at }}</p>
+            </div>
+            <div class="episode-reaction">
+                <a onclick="handleEpisodeLike({{ novel.novel_id }}, {{ episode.episode }})"><img src="{{ url_for('static', filename='image/like.svg') }}" alt="좋아요 누르기" width="25"></a><span>{{ episode.recommendations }} |</span>
+                <a onclick="handleEpisodeDislike({{ novel.novel_id }}, {{ episode.episode }})"><img src="{{ url_for('static', filename='image/dislike.svg') }}" alt="싫어요 누르기" width="25"></a><span>{{ episode.dislikes }} </span>
+                <div class="episode-edit">
+                    {% if is_author %}
+                    <button class="upload-episode" onclick="location.href='/novel/{{novel.novel_id}}/episode/{{ episode.episode }}/edit'">회차 수정</button>
+                    {% endif %}
+                </div>
+                {% if is_author %}
+                <div class="delete">
+                    <button class="delete" onclick="deleteEpisode({{ novel.novel_id }}, {{ episode.episode }})">에피소드 삭제</button>
+                </div>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/novel/{{ novel.novel_id }}?page=1">First</a>
+        <a href="/novel/{{ novel.novel_id }}?page={{ page - 1 }}">&#60; Prev</a>
+        {% endif %}
+
+        {% for i in range(1, total_pages + 1) %}
+            {% if i == page %}
+                <span class="active">{{ i }}</span>
+            {% else %}
+                <a href="/novel/{{ novel.novel_id }}?page={{ i }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+        <a href="/novel/{{ novel.novel_id }}?page={{ page + 1 }}">Next &#62;</a>
+        <a href="/novel/{{ novel.novel_id }}?page={{ total_pages }}">Last</a>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function goToEpisode(novelId) {
+            var episodeNumber = document.getElementById('episode-input').value;
+            if (episodeNumber) {
+                window.location.href = `/view/episode/${novelId}/${episodeNumber}`;
+            } else {
+                alert("에피소드 번호를 입력하세요.");
+            }
+        }
+
+        function handleLike(novelId) {
+            const csrfToken = getCookie('csrf_access_token');
+            fetch(`/api/novels/${novelId}/like`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+
+        function handleDislike(novelId) {
+            const csrfToken = getCookie('csrf_access_token');
+            fetch(`/api/novels/${novelId}/dislike`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+
+        function handleFavorite(novelId) {
+            const csrfToken = getCookie('csrf_access_token');
+            fetch(`/api/novels/${novelId}/favorite`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+            
+        function handleEpisodeLike(novelID, episodeId) {
+            const csrfToken = getCookie('csrf_access_token');
+            fetch(`/api/novels/${novelID}/episode/${episodeId}/like`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+
+        function handleEpisodeDislike(novelID, episodeId) {
+            const csrfToken = getCookie('csrf_access_token');
+            fetch(`/api/novels/${novelID}/episode/${episodeId}/dislike`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken 
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    alert("해당 요청이 성공적으로 처리되지 않았습니다.");
+                }
+                location.reload();
+            });
+        }
+
+        function deleteNovel(novelId) {
+            if (confirm("이 소설을 삭제하시겠습니까?")) {
+                const csrfToken = getCookie('csrf_access_token');
+                fetch(`/api/novels/${novelId}/delete`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        alert("소설 삭제에 실패했습니다.");
+                    } else {
+                        alert("소설이 성공적으로 삭제되었습니다.");
+                        window.location.href = '/';  // 홈으로 이동
+                    }
+                });
+            }
+        }
+
+        function deleteEpisode(novelId, episodeId) {
+            if (confirm("이 에피소드를 삭제하시겠습니까?")) {
+                const csrfToken = getCookie('csrf_access_token');
+                fetch(`/api/novels/${novelId}/episode/${episodeId}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ episodeId: episodeId })
+                }).then(response => {
+                    if (!response.ok) {
+                        alert("에피소드 삭제에 실패했습니다.");
+                    } else {
+                        alert("에피소드가 성공적으로 삭제되었습니다.");
+                        location.reload();  // 페이지 새로고침
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

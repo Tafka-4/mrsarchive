@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>소설 생성</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/novel_upload.css') }}">
+
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="top-right">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+        <button class="mypage-button" onclick="location.href='/mypage'">내 페이지</button>
+    </div>
+    {% if edit %}
+    <form id="uploadForm" method="post" action="/novel/edit" enctype="multipart/form-data">
+    {% else %}
+    <form id="uploadForm" method="post" action="/api/novels/upload" enctype="multipart/form-data">
+    {% endif %}
+        <div class="upload">
+            <div class="thumbnail-container">
+                <img id="thumbnail-preview" src="{% if edit and edit.thumbnail %}{{ user.thumbnail }}{% else %}{{ url_for('static', filename='image/default_profile.jpg') }}{% endif %}" alt="thumbnail" class="thumbnail-image" style="border-radius: 8px;">
+                
+                <input type="file" id="thumbnail" name="thumbnail" accept="image/*" onchange="previewThumbnailImage()">
+                <label for="thumbnail" class="change-image-button">소설 표지 변경</label>
+            </div>
+
+            <div class="form-group">
+                <label for="title">제목:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="introduction">소개:</label>
+                <textarea id="introduction" name="introduction" rows="4" cols="80" style="width: 800px; height: 150px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+                {% if not edit %}
+                <input type="submit" value="업로드">
+                {% else %}
+                <input type="submit" value="수정">
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        function previewThumbnailImage() {
+            const fileInput = document.getElementById('thumbnail');
+            const preview = document.getElementById('thumbnail-preview');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;  // 이미지 미리보기 설정
+                };
+                reader.readAsDataURL(file);  // 파일을 읽어서 미리보기 처리
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const csrfToken = getCookie('csrf_access_token');
+
+            formData.append('csrf_token', csrfToken);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+                credentials: "include", 
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("몬가... 몬가 이상함... 몇 번 더 해보고 안되면 탚으카한테 문의해줘...");
+                }
+                return response.json();  // 응답을 JSON으로 파싱
+            })
+            .then(data => {
+                alert("소설이 성공적으로 업로드되었습니다.");
+                location.href = '/novel/' + data.novel_id;  // 소설 페이지로 이동
+            })
+            .catch(error => {
+                console.error('An error occurred:', error);
+                alert(error.message);  // 에러 메시지 표시
+            });
+        });
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
+</body>
+</html>

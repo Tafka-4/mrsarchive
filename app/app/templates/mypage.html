@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 정보</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mypage.css') }}">
+    <script>
+        (function() {
+            const darkModeSetting = localStorage.getItem('darkMode');
+            if (darkModeSetting === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="top-right">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">다크 모드 전환</button>
+        <button class="home-button" onclick="location.href='/'">홈으로</button>
+    </div>
+    <div class="user-info">
+        <div class="profile-picture-section">
+            {% if user.profile_image %}
+            <img src="{{ user.profile_image }}" alt="Profile Picture" width="100", height="100" style="border-radius: 100%">
+            {% else %}
+            <img src="{{ url_for('static', filename='image/default_profile.jpg') }}" width="100", height="100" style="border-radius: 100%">
+            {% endif %}
+            <!-- 프로필 이미지 변경 버튼 -->
+            <form id="image-upload" action="/api/uploads/user" method="POST" enctype="multipart/form-data">
+                <input type="file" id="profile_image" name="profile_image" accept="image/*" style="display:none;" onchange="uploadProfileImage()">
+                <label for="profile_image" class="change-image-button">프로필 이미지 변경</label>
+            </form>
+        </div>
+        <div>
+            <p>이름: {{ user.nickname }} <i>(UID: {{user.user_id}})</i></p>
+            <p>이메일: {{ user.email }}</p>
+            {% if user.introduction %}
+            <p>소개: {{ user.introduction}}</p>
+            {% else %}
+            <p>소개: -</p>
+            {% endif %}
+
+            <p>계정 생성일: {{ user.created_at }}</p>
+        </div>
+    </div>
+
+    <!-- 이메일, 비밀번호 수정 폼 -->
+    <div id="edit-form" class="edit-form" style="display:block;">
+        <form id="change-info" action="/api/users/change-info" method="POST">
+            <label for="nickname">이름:</label>
+            <input type="text" id="nickname" name="nickname" value="{{ user.nickname }}" class="text-input"><br>
+            <label for="introduction">소개:</label>
+            {% if user.introduction %}
+            <textarea id="introduction" name="introduction" class="textarea-input">{{ user.introduction }}</textarea><br>
+            {% else %}
+            <textarea id="introduction" name="introduction" class="textarea-input"></textarea><br>
+            {% endif %}
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" class="text-input"><br>
+            <button type="submit" class="save-button">저장</button>
+        </form><br>
+        <form id="change-pw" action="/api/users/change-pw" method="POST">
+            <label for="old-password">이전 비밀번호:</label>
+            <input type="password" id="old-password" name="old-password" placeholder="이전 비밀번호 입력" class="text-input"><br>
+            <label for="password">새 비밀번호:</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호 변경" class="text-input"><br>
+            <button type="submit" class="change-password">비밀번호 변경</button>
+        </form>
+    </div>      
+    </div>
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function formDataToJson(formData) {
+            const object = {};
+            formData.forEach((value, key) => {
+                object[key] = value;
+            });
+            return JSON.stringify(object);
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        document.getElementById('change-info').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const csrfToken = getCookie('csrf_access_token');
+
+            fetch(form.action, {
+                method: 'PUT',
+                body: formDataToJson(formData),
+                credentials: "include",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    history.go(-1);
+                    alert("성공적으로 수정되었습니다.");
+                    console.log('Form submitted successfully!');
+                } else {
+                    alert("몬가... 몬가 이상함... 몇 번 더 해보고 안되면 탚으카한테 문의해줘...")
+                    console.error('Form submission failed.');
+                }
+            }).catch(error => {
+                console.error('An error occurred:', error);
+            });
+        });
+
+    document.getElementById('change-pw').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const csrfToken = getCookie('csrf_access_token');
+
+        fetch(form.action, {
+            method: 'PUT',
+            body: formDataToJson(formData),
+            credentials: "include",
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Password change submitted successfully!');
+            } else {
+                console.error('Password change submission failed.');
+            }
+        }).catch(error => {
+            console.error('An error occurred:', error);
+        });
+    });
+
+    function uploadProfileImage() {
+        const form = document.getElementById('image-upload');
+        const formData = new FormData(form);
+        const csrfToken = getCookie('csrf_access_token');
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Profile image uploaded successfully!');
+            } else {
+                console.error('Failed to upload profile image.');
+            }
+        }).catch(error => {
+            console.error('An error occurred during the upload:', error);
+        });
+    }
+    </script>
+</body>
+</html>
